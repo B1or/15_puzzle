@@ -34,6 +34,7 @@ import androidx.compose.ui.window.Dialog
 import kotlin.random.Random
 
 private const val SHAKER_COUNT = 1000
+private const val SIZE = 4
 
 private val gameField = arrayOf(intArrayOf(1, 2, 3, 4), intArrayOf(5, 6, 7, 8), intArrayOf(9, 10, 11, 12),
     intArrayOf(13, 14, 15, 0))
@@ -44,7 +45,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val tiles = arrayListOf<MutableState<Pair<Int, Int>>>()
-        for (i in 1..15)
+        for (i in 1..< SIZE * SIZE)
             seek(i)?.let { tiles.add(mutableStateOf(it)) }
         start(tiles)
         val showDialog = mutableStateOf(false)
@@ -64,8 +65,8 @@ fun Greeting( tiles: ArrayList<MutableState<Pair<Int, Int>>>, showDialog: Mutabl
     Box(modifier = Modifier
         .width(minSideScreen)
         .height(minSideScreen)) {
-        val sideButton = (minSideScreen - 8.dp) / 4
-        for (i in 1..15) {
+        val sideButton = (minSideScreen - 8.dp) / SIZE
+        for (i in 1..< SIZE * SIZE) {
             Button(
                 onClick = {
                     click(tiles, i, showDialog)
@@ -106,34 +107,6 @@ fun Greeting( tiles: ArrayList<MutableState<Pair<Int, Int>>>, showDialog: Mutabl
                 }
             }
         }
-/*
-        AlertDialog(
-            title = {
-                Text(text = "15")
-            },
-            text = {
-                Text(text = "You win!")
-            },
-            onDismissRequest = {},
-            confirmButton = {
-                TextButton(onClick = {
-                    showDialog.value = false
-                    start(tiles)
-                }) {
-                    Text("Play")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    showDialog.value = false
-                    val activity = (context as? Activity)
-                    activity?.finish()
-                }) {
-                    Text("Exit")
-                }
-            }
-        )
-*/
 }
 
 @Preview(showBackground = true)
@@ -148,8 +121,8 @@ fun GreetingPreview() {
 }
 
 private fun seek(tile: Int): Pair<Int, Int>? {
-    for (y in 0..3)
-        for (x in 0..3)
+    for (y in 0..< SIZE)
+        for (x in 0..< SIZE)
             if (gameField[y][x] == tile)
                 return Pair(x, y)
     return null
@@ -165,7 +138,7 @@ private fun click(tiles: ArrayList<MutableState<Pair<Int, Int>>>, button: Int, s
                 tiles[button - 1].value = Pair(coordinate.first - 1, coordinate.second)
             }
         }
-        if (coordinate.first + 1 < 4) {
+        if (coordinate.first + 1 < SIZE) {
             if (gameField[coordinate.second][coordinate.first + 1] == 0) {
                 move(Direction.LEFT)
                 tiles[button - 1].value = Pair(coordinate.first + 1, coordinate.second)
@@ -177,7 +150,7 @@ private fun click(tiles: ArrayList<MutableState<Pair<Int, Int>>>, button: Int, s
                 tiles[button - 1].value = Pair(coordinate.first, coordinate.second - 1)
             }
         }
-        if (coordinate.second + 1 < 4) {
+        if (coordinate.second + 1 < SIZE) {
             if (gameField[coordinate.second + 1][coordinate.first] == 0) {
                 move(Direction.UP)
                 tiles[button - 1].value = Pair(coordinate.first, coordinate.second + 1)
@@ -190,9 +163,9 @@ private fun click(tiles: ArrayList<MutableState<Pair<Int, Int>>>, button: Int, s
 private fun check(showDialog: MutableState<Boolean>) {
     var check = true
     var tile = 0
-    for (y in 0..3)
-        for (x in 0..3)
-            check = if (x == 3 && y == 3)
+    for (y in 0..< SIZE)
+        for (x in 0..< SIZE)
+            check = if (x == SIZE - 1 && y == SIZE - 1)
                 check && (gameField[y][x] == 0)
             else
                 check && (gameField[y][x] == ++tile)
@@ -222,7 +195,7 @@ private fun move(direction: Direction) {
                 }
             }
             Direction.DOWN -> {
-                if (coordinate.second + 1 < 4) {
+                if (coordinate.second + 1 < SIZE) {
                     gameField[coordinate.second][coordinate.first] = gameField[coordinate.second + 1][coordinate.first]
                     gameField[coordinate.second + 1][coordinate.first] = 0
                 }
@@ -234,7 +207,7 @@ private fun move(direction: Direction) {
                 }
             }
             Direction.RIGHT -> {
-                if (coordinate.first + 1 < 4) {
+                if (coordinate.first + 1 < SIZE) {
                     gameField[coordinate.second][coordinate.first] = gameField[coordinate.second][coordinate.first + 1]
                     gameField[coordinate.second][coordinate.first + 1] = 0
                 }
@@ -245,7 +218,7 @@ private fun move(direction: Direction) {
 
 private fun start(tiles: ArrayList<MutableState<Pair<Int, Int>>>) {
     shaker()
-    for (i in 1..15)
+    for (i in 1..< SIZE * SIZE)
         seek(i)?.let { tiles[i - 1] = mutableStateOf(it) }
     isClickable = true
 }
