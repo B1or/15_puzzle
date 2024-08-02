@@ -3,6 +3,7 @@ package tech.droi.a15puzzle
 import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,12 +26,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.app.ActivityCompat.finishAffinity
 import kotlin.random.Random
 
 private const val SHAKER_COUNT = 1000
@@ -87,26 +90,34 @@ fun Greeting( tiles: ArrayList<MutableState<Pair<Int, Int>>>, showDialog: Mutabl
     if (showDialog.value)
         Dialog(onDismissRequest = {}) {
             Card (shape = RoundedCornerShape(8.dp)) {
-                Column(modifier = Modifier.padding(16.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "You win!", textAlign = TextAlign.Center)
+                Column(modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = stringResource(R.string.win), textAlign = TextAlign.Center)
                     Row {
                         TextButton(onClick = {
                             showDialog.value = false
                             start(tiles)
                         }) {
-                            Text("Play")
+                            Text(stringResource(R.string.play))
                         }
                         TextButton(onClick = {
                             showDialog.value = false
                             val activity = (context as? Activity)
-                            activity?.finish()
+                            if (activity != null)
+                                finishAffinity(activity)
                         }) {
-                            Text("Exit")
+                            Text(stringResource(R.string.exit))
                         }
                     }
                 }
             }
         }
+    BackHandler {
+        val activity = (context as? Activity)
+        if (activity != null)
+            finishAffinity(activity)
+    }
 }
 
 @Preview(showBackground = true)

@@ -11,8 +11,8 @@ android {
         applicationId = "tech.droi.a15puzzle"
         minSdk = 30
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.00"
+        versionCode = 2
+        versionName = "1.01"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
