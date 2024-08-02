@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -15,7 +16,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -26,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -64,36 +69,49 @@ fun Greeting( tiles: ArrayList<MutableState<Pair<Int, Int>>>, showDialog: Mutabl
     val context = LocalContext.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
-    val minSideScreen = min(screenHeight, screenWidth)
-    Box(modifier = Modifier
-        .width(minSideScreen)
-        .height(minSideScreen)) {
-        val sideButton = (minSideScreen - 8.dp) / SIZE
-        for (i in 1..< SIZE * SIZE) {
-            Button(
-                onClick = {
-                    click(tiles, i, showDialog)
-                },
-                modifier = Modifier
-                    .offset(4.dp + sideButton * tiles[i - 1].value.first, 4.dp + sideButton * tiles[i - 1].value.second)
-                    .width(sideButton)
-                    .height(sideButton)
-                    .padding(4.dp),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(
-                    text = i.toString(), fontSize = 24.sp
-                )
+    val sideCard = min(screenHeight, screenWidth) - 8.dp
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(4.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Card(modifier = Modifier
+            .width(sideCard)
+            .height(sideCard),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        ) {
+            Box {
+                val sideButton = (sideCard - 4.dp * (SIZE + 1)) / SIZE
+                for (i in 1..< SIZE * SIZE) {
+                    Button(
+                        onClick = {
+                            click(tiles, i, showDialog)
+                        },
+                        modifier = Modifier
+                            .offset(4.dp + (sideButton + 4.dp) * tiles[i - 1].value.first,
+                                4.dp + (sideButton + 4.dp) * tiles[i - 1].value.second)
+                            .width(sideButton)
+                            .height(sideButton),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.teal_200))
+                    ) {
+                        Text(
+                            text = i.toString(), fontSize = 24.sp, color = colorResource(R.color.black)
+                        )
+                    }
+                }
             }
         }
     }
     if (showDialog.value)
         Dialog(onDismissRequest = {}) {
-            Card (shape = RoundedCornerShape(8.dp)) {
+            Card(shape = RoundedCornerShape(8.dp)) {
                 Column(modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = stringResource(R.string.win), textAlign = TextAlign.Center)
+                    Text(text = stringResource(R.string.win), textAlign = TextAlign.Center, color = colorResource(R.color.red))
                     Row {
                         TextButton(onClick = {
                             showDialog.value = false
