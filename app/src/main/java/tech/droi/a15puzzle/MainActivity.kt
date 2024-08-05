@@ -30,19 +30,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat.finishAffinity
 import kotlin.random.Random
 
 private const val SHAKER_COUNT = 1000
 private const val SIZE = 4
+private const val PADDING = 8
 
 private val gameField = arrayOf(intArrayOf(1, 2, 3, 4), intArrayOf(5, 6, 7, 8), intArrayOf(9, 10, 11, 12),
     intArrayOf(13, 14, 15, 0))
@@ -69,36 +70,37 @@ fun Greeting( tiles: ArrayList<MutableState<Pair<Int, Int>>>, showDialog: Mutabl
     val context = LocalContext.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
-    val sideCard = min(screenHeight, screenWidth) - 8.dp
+    val sideCard = min(screenHeight, screenWidth) - 2 * PADDING.dp
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(4.dp),
+            .padding(PADDING.dp),
         contentAlignment = Alignment.CenterStart
     ) {
         Card(modifier = Modifier
             .width(sideCard)
             .height(sideCard),
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
         ) {
             Box {
-                val sideButton = (sideCard - 4.dp * (SIZE + 1)) / SIZE
+                val sideButton = (sideCard - PADDING.dp * (SIZE + 1)) / SIZE
                 for (i in 1..< SIZE * SIZE) {
                     Button(
                         onClick = {
                             click(tiles, i, showDialog)
                         },
                         modifier = Modifier
-                            .offset(4.dp + (sideButton + 4.dp) * tiles[i - 1].value.first,
-                                4.dp + (sideButton + 4.dp) * tiles[i - 1].value.second)
+                            .offset(
+                                PADDING.dp + (sideButton + PADDING.dp) * tiles[i - 1].value.first,
+                                PADDING.dp + (sideButton + PADDING.dp) * tiles[i - 1].value.second)
                             .width(sideButton)
                             .height(sideButton),
                         shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.teal_200))
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Text(
-                            text = i.toString(), fontSize = 24.sp, color = colorResource(R.color.black)
+                            text = i.toString(), fontSize = 24.sp, color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -107,25 +109,45 @@ fun Greeting( tiles: ArrayList<MutableState<Pair<Int, Int>>>, showDialog: Mutabl
     }
     if (showDialog.value)
         Dialog(onDismissRequest = {}) {
-            Card(shape = RoundedCornerShape(8.dp)) {
+            Card(
+                shape = RoundedCornerShape(8.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary)
+                ) {
                 Column(modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = stringResource(R.string.win), textAlign = TextAlign.Center, color = colorResource(R.color.red))
+                    Text(
+                        text = stringResource(R.string.win),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSecondary,
+                        fontSize = 24.sp
+                    )
                     Row {
-                        TextButton(onClick = {
-                            showDialog.value = false
-                            start(tiles)
-                        }) {
-                            Text(stringResource(R.string.play))
+                        TextButton(
+                            onClick = {
+                                showDialog.value = false
+                                start(tiles)
+                            }
+                        ) {
+                            Text(
+                                stringResource(R.string.play),
+                                color = MaterialTheme.colorScheme.onSecondary,
+                                fontSize = 24.sp
+                            )
                         }
-                        TextButton(onClick = {
-                            showDialog.value = false
-                            val activity = (context as? Activity)
-                            if (activity != null)
-                                finishAffinity(activity)
-                        }) {
-                            Text(stringResource(R.string.exit))
+                        TextButton(
+                            onClick = {
+                                showDialog.value = false
+                                val activity = (context as? Activity)
+                                if (activity != null)
+                                    finishAffinity(activity)
+                            }
+                        ) {
+                            Text(
+                                stringResource(R.string.exit),
+                                color = MaterialTheme.colorScheme.onSecondary,
+                                fontSize = 24.sp
+                            )
                         }
                     }
                 }
@@ -145,7 +167,7 @@ fun GreetingPreview() {
         mutableStateOf(Pair(3, 0)), mutableStateOf(Pair(0, 1)), mutableStateOf(Pair(1, 1)), mutableStateOf(Pair(2, 1)),
         mutableStateOf(Pair(3, 1)), mutableStateOf(Pair(0, 2)), mutableStateOf(Pair(1, 2)), mutableStateOf(Pair(2, 2)),
         mutableStateOf(Pair(3, 2)), mutableStateOf(Pair(0, 3)), mutableStateOf(Pair(1, 3)), mutableStateOf(Pair(2, 3))) }
-    val showDialog = remember { mutableStateOf(true) }
+    val showDialog = remember { mutableStateOf(false) }
     Greeting(tiles, showDialog)
 }
 
