@@ -3,4 +3,5 @@
     <string name="win">You win!</string>
     <string name="play">Play</string>
     <string name="exit">Exit</string>
+    <string name="steps_">Steps:</string>
 </resources>
